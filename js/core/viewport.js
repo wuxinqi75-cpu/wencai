@@ -33,11 +33,27 @@ export function toNDC(clientX, clientY, out) {
     out.y = -(p.y / viewH()) * 2 + 1;
     return out;
 }
+/* 给 CSS 用的方向标记：
+ *   html.land       逻辑视口是横的（含桌面）
+ *   html.short-land 横的、而且短（手机横屏 / 假装横屏），面板要改成侧边抽屉
+ * 靠 JS 打标记而不是 @media，因为「假装横屏」时物理方向仍是竖的，媒体查询看不见。 */
+function syncOrientation() {
+    const w = viewW();
+    const h = viewH();
+    const de = document.documentElement;
+    const land = w > h;
+    de.classList.toggle('land', land);
+    de.classList.toggle('short-land', land && Math.min(w, h) <= 560);
+}
+window.addEventListener('resize', syncOrientation);
+window.addEventListener('orientationchange', syncOrientation);
+syncOrientation();
 export function setForcedLandscape(on) {
     if (forced === on)
         return;
     forced = on;
     document.documentElement.classList.toggle('force-land', on);
+    syncOrientation();
     for (const cb of subs)
         cb();
 }

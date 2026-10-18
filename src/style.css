@@ -124,7 +124,7 @@ body {
   left: 50%;
   bottom: 22%;
   transform: translate(-50%, 10px);
-  max-width: min(78vw, 460px);
+  max-width: min(calc(var(--lw) * 0.78), 460px);
   padding: 14px 20px;
   border-radius: 16px;
   background: rgba(13, 17, 36, 0.74);
@@ -223,6 +223,38 @@ body {
   .toast {
     font-size: 14px;
     bottom: 18%;
+  }
+}
+
+/* ---------------- 逻辑视口单位 ---------------- */
+/* 假装横屏时物理尺寸和逻辑尺寸互换，但 CSS 的 vw/vh 永远指物理视口：
+   直接在面板里写 92vw / 84vh，横屏下会算成 359px 宽、709px 高（整块糊在脸上）。
+   面板尺寸一律用 --lw / --lh，三个场景自动都对：
+     竖屏手机 390×844  → 390 / 844（和以前一样）
+     假装横屏 844×390  → 844 / 390
+     真横屏   844×390  → 844 / 390 */
+
+:root {
+  --lw: 100vw;
+  --lh: 100vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --lw: 100dvw;
+    --lh: 100dvh;
+  }
+}
+
+html.force-land {
+  --lw: 100vh;
+  --lh: 100vw;
+}
+
+@supports (height: 100dvh) {
+  html.force-land {
+    --lw: 100dvh;
+    --lh: 100dvw;
   }
 }
 

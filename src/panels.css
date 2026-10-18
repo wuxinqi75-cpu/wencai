@@ -362,8 +362,8 @@
 }
 
 .letter-card {
-  width: min(92vw, 500px);
-  max-height: 78vh;
+  width: min(calc(var(--lw) * 0.92), 500px);
+  max-height: calc(var(--lh) * 0.78);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 18px;
@@ -419,8 +419,8 @@
 }
 
 .finale-card {
-  width: min(92vw, 540px);
-  max-height: 84vh;
+  width: min(calc(var(--lw) * 0.92), 540px);
+  max-height: calc(var(--lh) * 0.84);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 22px;
@@ -838,8 +838,8 @@
 
 .vault-card {
   position: relative;
-  width: min(92vw, 520px);
-  max-height: 80vh;
+  width: min(calc(var(--lw) * 0.92), 520px);
+  max-height: calc(var(--lh) * 0.8);
   display: flex;
   flex-direction: column;
   border-radius: 18px;
@@ -929,7 +929,7 @@
 }
 
 .end-card {
-  width: min(88vw, 420px);
+  width: min(calc(var(--lw) * 0.88), 420px);
   border-radius: 22px;
   padding: 30px 24px 24px;
   text-align: center;
@@ -1031,3 +1031,122 @@
     gap: 4px;
   }
 }
+
+/* ============================================================
+   手机横屏（含「假装横屏」）：面板不糊住整个视野
+   html.short-land 由 core/viewport.ts 打上 —— 逻辑视口是横的且短。
+   面板改成贴右侧的抽屉，左边留出房间；背景只压一层左边的渐变，不模糊。
+   ============================================================ */
+
+html.short-land .finale-sheet,
+html.short-land .vault-sheet {
+  justify-content: center;
+  align-items: flex-end;
+  padding: 8px 6px 8px 0;
+  background: linear-gradient(
+    to left,
+    rgba(2, 3, 10, 0.72) 0%,
+    rgba(2, 3, 10, 0.4) 40%,
+    rgba(2, 3, 10, 0.08) 66%,
+    rgba(2, 3, 10, 0) 86%
+  );
+  backdrop-filter: none;
+}
+
+html.short-land .end-sheet {
+  background: rgba(2, 3, 10, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+html.short-land .letter-sheet {
+  background: rgba(2, 3, 10, 0.46);
+  backdrop-filter: blur(3px);
+}
+
+html.short-land .finale-card,
+html.short-land .vault-card {
+  width: min(calc(var(--lw) * 0.44), 440px);
+  max-height: calc(var(--lh) - 16px);
+  border-radius: 18px 2px 2px 18px;
+  padding: 14px 16px 12px;
+}
+
+html.short-land .end-card {
+  width: min(calc(var(--lw) * 0.6), 420px);
+  max-height: calc(var(--lh) - 16px);
+  overflow-y: auto;
+  padding: 20px 20px 16px;
+}
+
+html.short-land .finale-kicker {
+  font-size: 9px;
+}
+
+html.short-land .finale-title {
+  margin: 8px 0 6px;
+  font-size: 17px;
+}
+
+html.short-land .finale-sub {
+  margin-bottom: 10px;
+}
+
+html.short-land .finale-block {
+  padding: 9px 0 2px;
+}
+
+html.short-land .achv-list {
+  margin-top: 6px;
+  gap: 3px;
+}
+
+html.short-land .achv-row {
+  grid-template-columns: 14px 70px 1fr;
+  font-size: 11.5px;
+}
+
+html.short-land .bottle-input {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+}
+
+html.short-land .letter-card {
+  max-height: calc(var(--lh) - 20px);
+  padding: 16px 18px;
+}
+
+/* 右侧抽屉贴着边，别再顶一层安全区内边距 */
+html.short-land .float-btn {
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+
+/* 抽屉在右边，右上角那排按钮（声音 / 横屏）挪到左上，不然被抽屉盖住点不到 */
+html.short-land .sound-btn,
+html.short-land .turn-btn {
+  right: auto;
+  left: calc(14px + env(safe-area-inset-left, 0px));
+}
+
+html.short-land .turn-btn {
+  top: calc(52px + env(safe-area-inset-top, 0px));
+}
+
+html.short-land .focus-bar {
+  right: auto;
+  left: calc(8px + env(safe-area-inset-left, 0px));
+  transform: translate(-14px, -50%);
+}
+
+html.short-land .focus-bar.on {
+  transform: translate(0, -50%);
+}
+
+/* 抽屉只吃自己那一块：左边露出来的房间还能拖视角、点星星 */
+html.short-land .sheet {
+  pointer-events: none;
+}
+
+html.short-land .sheet > * {
+  pointer-events: auto;
+}
+
