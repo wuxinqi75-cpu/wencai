@@ -1,4 +1,5 @@
 /* 竖屏时提示可以横过来看：只提示一次，不挡操作 */
+import { isForcedLandscape } from '../core/viewport.js';
 const KEY = 'ds_wencai_rotate_tip';
 function isPortrait() {
     return window.matchMedia('(orientation: portrait)').matches;
@@ -14,7 +15,7 @@ export function createRotateHint() {
       <span class="rotate-phone"></span>
       <span class="rotate-arrow">↻</span>
     </div>
-    <div class="rotate-txt"><span>把手机横过来</span><b>房间会完整很多</b></div>
+    <div class="rotate-txt"><span>把手机横过来</span><b>或点右上角「横屏」</b></div>
     <button class="rotate-x" type="button">知道啦</button>
   `;
     document.body.appendChild(el);
@@ -36,6 +37,8 @@ export function createRotateHint() {
     };
     el.querySelector('.rotate-x').addEventListener('click', dismiss);
     const onOrient = () => {
+        if (isForcedLandscape())
+            return;
         if (!isPortrait() && isSmall() && shown && !switched) {
             switched = true;
             const txt = el.querySelector('.rotate-txt');
@@ -51,6 +54,8 @@ export function createRotateHint() {
         maybeShow(delayMs = 2600) {
             if (shown)
                 return;
+            if (isForcedLandscape())
+                return;
             if (!isPortrait() || !isSmall())
                 return;
             try {
@@ -63,7 +68,7 @@ export function createRotateHint() {
             shown = true;
             window.clearTimeout(timer);
             timer = window.setTimeout(() => {
-                if (!isPortrait())
+                if (!isPortrait() || isForcedLandscape())
                     return;
                 el.classList.add('on');
                 window.clearTimeout(timer);

@@ -8,6 +8,8 @@ import { buildCakeCut } from './world/cakeCut.js';
 import { createOverlay } from './ui/overlay.js';
 import { createFirefly } from './core/firefly.js';
 import { createRotateHint } from './ui/rotate.js';
+import { createTurnButton } from './ui/turn.js';
+import { viewW, viewH, toLocal, toNDC, onLayoutChange, setForcedLandscape } from './core/viewport.js';
 import { createFireworks } from './fx/fireworks.js';
 import { startBlow } from './core/mic.js';
 import { showBlowPanel, showWish, showLetter, showFinale, showFloatButton, showCornerButton, showEndCard, createFocusBar } from './ui/panels.js';
@@ -19,6 +21,12 @@ const canvas = document.getElementById('stage');
 const overlay = createOverlay(7);
 const vault = createVault();
 const rotateHint = createRotateHint();
+const turnBtn = createTurnButton(() => {
+    onResize();
+    turnBtn.sync();
+    rotateHint.hide();
+});
+onLayoutChange(onResize);
 const fireworks = createFireworks();
 /* ---------------- 渲染器 ---------------- */
 const renderer = new THREE.WebGLRenderer({
@@ -104,8 +112,8 @@ let lastY = 0;
 let dragYaw = 0;
 let dragPitch = 0;
 function onResize() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const w = viewW();
+    const h = viewH();
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -115,20 +123,22 @@ window.addEventListener('resize', onResize);
 onResize();
 window.addEventListener('pointerdown', (e) => {
     dragging = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
+    const p = toLocal(e.clientX, e.clientY);
+    lastX = p.x;
+    lastY = p.y;
 });
 window.addEventListener('pointermove', (e) => {
-    pointer.tx = (e.clientX / window.innerWidth) * 2 - 1;
-    pointer.ty = (e.clientY / window.innerHeight) * 2 - 1;
+    const p = toLocal(e.clientX, e.clientY);
+    pointer.tx = (p.x / viewW()) * 2 - 1;
+    pointer.ty = (p.y / viewH()) * 2 - 1;
     if (!dragging)
         return;
     if (phase === 'cut' || phase === 'wish')
         return;
-    dragYaw = THREE.MathUtils.clamp(dragYaw - (e.clientX - lastX) * 0.0016, -0.24, 0.24);
-    dragPitch = THREE.MathUtils.clamp(dragPitch - (e.clientY - lastY) * 0.0011, -0.08, 0.1);
-    lastX = e.clientX;
-    lastY = e.clientY;
+    dragYaw = THREE.MathUtils.clamp(dragYaw - (p.x - lastX) * 0.0016, -0.24, 0.24);
+    dragPitch = THREE.MathUtils.clamp(dragPitch - (p.y - lastY) * 0.0011, -0.08, 0.1);
+    lastX = p.x;
+    lastY = p.y;
 });
 window.addEventListener('pointerup', () => {
     dragging = false;
@@ -138,7 +148,7 @@ window.addEventListener('pointercancel', () => {
 });
 /* ---------------- 镜头每帧 ---------------- */
 function updateCamera(t, dt) {
-    const aspect = window.innerWidth / window.innerHeight;
+    const aspect = viewW() / viewH();
     const k = THREE.MathUtils.clamp((aspect - 0.55) / 0.95, 0, 1);
     const shot = SHOTS[shotName];
     const targetLook = shot.tall.target.clone().lerp(shot.wide.target, k);
@@ -267,7 +277,7 @@ function showCakeToggle() {
 }
 function tap(clientX, clientY) {
     if (phase === 'open') {
-        ndc.set((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
+        toNDC(clientX, clientY, ndc);
         raycaster.setFromCamera(ndc, camera);
         if (raycaster.intersectObject(cakeCut.hit, false).length > 0) {
             openLetter();
@@ -278,7 +288,7 @@ function tap(clientX, clientY) {
         softClick();
         return;
     }
-    ndc.set((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
+    toNDC(clientX, clientY, ndc);
     raycaster.setFromCamera(ndc, camera);
     const hits = raycaster.intersectObjects(decor.stars.filter((s) => !s.collected && s.root.visible).map((s) => s.hit), false);
     if (hits.length) {
@@ -435,8 +445,8 @@ function doCut(swipe) {
     window.clearTimeout(cutTimer);
     cutBtn?.close();
     cutBtn = null;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const w = viewW();
+    const h = viewH();
     if (swipe)
         fireworks.slash(swipe.x1, swipe.y1, swipe.x2, swipe.y2);
     else
@@ -550,11 +560,13 @@ canvas.addEventListener('pointerdown', (e) => {
     downAt = performance.now();
 });
 canvas.addEventListener('pointerup', (e) => {
-    const dx = e.clientX - downX;
-    const dy = e.clientY - downY;
+    const a = toLocal(downX, downY);
+    const b = toLocal(e.clientX, e.clientY);
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
     const moved = Math.hypot(dx, dy);
     if (phase === 'cut' && Math.abs(dx) > 70 && Math.abs(dy) < 140) {
-        doCut({ x1: downX, y1: downY, x2: e.clientX, y2: e.clientY });
+        doCut({ x1: a.x, y1: a.y, x2: b.x, y2: b.y });
         return;
     }
     if (moved < 14 && performance.now() - downAt < 700)
@@ -652,4 +664,9 @@ dbg.__toCut = () => {
 };
 dbg.__blow = () => {
     blowProgress = 0.99;
+};
+dbg.__turn = turnBtn;
+dbg.__forceLand = (on) => {
+    setForcedLandscape(on);
+    turnBtn.sync();
 };

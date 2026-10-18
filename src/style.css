@@ -225,3 +225,30 @@ body {
     bottom: 18%;
   }
 }
+
+/* ---------------- 假装横屏 ---------------- */
+/* 手机锁了竖屏时的兜底：整页顺时针转 90°，逻辑视口 = 物理高 × 物理宽。
+   脚本侧统一走 core/viewport 的 viewW/viewH、toLocal/toNDC。 */
+
+html.force-land {
+  background: #05060d;
+}
+
+html.force-land body {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100vh;
+  height: 100vw;
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: 50% 50%;
+  overflow: hidden;
+}
+
+@supports (height: 100dvh) {
+  html.force-land body {
+    width: 100dvh;
+    height: 100dvw;
+  }
+}
+

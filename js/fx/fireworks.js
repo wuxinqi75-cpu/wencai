@@ -1,6 +1,7 @@
 /* 2D 烟花：形状从离屏 canvas 采样，爱心 / 星星 / 蛋糕 / 文彩 */
 import { CONFIG } from '../data/content.js';
 import { sndPop } from '../core/audio.js';
+import { viewW, viewH } from '../core/viewport.js';
 /* ---------------- 形状采样 ---------------- */
 function sample(draw, step = 4, cap = 230) {
     const S = 160;
@@ -144,8 +145,8 @@ export function createFireworks() {
     let dpr = 1;
     const resize = () => {
         dpr = Math.min(window.devicePixelRatio || 1, 2);
-        w = window.innerWidth;
-        h = window.innerHeight;
+        w = viewW();
+        h = viewH();
         canvas.width = Math.floor(w * dpr);
         canvas.height = Math.floor(h * dpr);
         canvas.style.width = `${w}px`;
