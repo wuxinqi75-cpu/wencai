@@ -1131,6 +1131,11 @@ html.short-land .turn-btn {
   top: calc(52px + env(safe-area-inset-top, 0px));
 }
 
+/* 「回房间」原来也在左上 64px，会跟挪过来的横屏按钮叠住 */
+html.short-land .corner-btn {
+  top: calc(98px + env(safe-area-inset-top, 0px));
+}
+
 html.short-land .focus-bar {
   right: auto;
   left: calc(8px + env(safe-area-inset-left, 0px));
