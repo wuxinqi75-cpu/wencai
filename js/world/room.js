@@ -203,7 +203,7 @@ export function buildRoom(updates) {
         m.userData.noOutline = true;
         return m;
     };
-    const rod = cyl(0.012, 0.012, winX1 - winX0 + 0.9, 0xd8b07a, 8);
+    const rod = cyl(0.016, 0.016, winX1 - winX0 + 0.9, 0xd8b07a, 14);
     rod.rotation.z = Math.PI / 2;
     rod.position.set((winX0 + winX1) / 2, winY1 + 0.1, -2.86);
     room.add(rod);
@@ -247,13 +247,16 @@ export function buildRoom(updates) {
     rug.userData.noOutline = true;
     room.add(rug);
     /* ---------------- 灯串 ---------------- */
+    /* 这根线原来半径 0.005（1cm），远看比一个像素还细，渲染出来是断续的虚线段，
+       镜头一晃就在跳；而且它穿过两边的窗帘，那里的线会被帘子切成一节一节的。
+       现在：加粗到 0.009，整根挪到窗帘前面（z=-2.78，帘子最靠前只到 -2.815）。 */
     const pts = [];
     for (let i = 0; i <= 22; i++) {
         const u = i / 22;
-        pts.push(new THREE.Vector3(-3.35 + u * 6.7, 2.72 - Math.sin(u * Math.PI) * 0.42, -2.86 + Math.sin(u * Math.PI * 2) * 0.05));
+        pts.push(new THREE.Vector3(-3.35 + u * 6.7, 2.72 - Math.sin(u * Math.PI) * 0.42, -2.78 + Math.sin(u * Math.PI * 2) * 0.03));
     }
     const curve = new THREE.CatmullRomCurve3(pts);
-    const wire = new THREE.Mesh(new THREE.TubeGeometry(curve, 140, 0.005, 4, false), toon(0x23253c));
+    const wire = new THREE.Mesh(new THREE.TubeGeometry(curve, 140, 0.009, 6, false), toon(0x23253c));
     wire.userData.noOutline = true;
     room.add(wire);
     const bulbMat = new THREE.MeshBasicMaterial({ color: 0xffe1ac });
@@ -339,7 +342,7 @@ export function buildRoom(updates) {
     ];
     hangPos.forEach(([x, y], i) => {
         const drop = Math.max(0.12, rodY - y);
-        const line = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, drop, 4), toon(0x2a2c46));
+        const line = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, drop, 6), toon(0x2a2c46));
         line.position.set(x, y + drop / 2, -2.9);
         line.userData.noOutline = true;
         const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.075, 0), toon(i === 1 ? 0xffd38a : 0xf6b8cc));
