@@ -365,7 +365,7 @@ export function buildRoom(updates) {
         new THREE.Vector3(-3.44, 2.78, -1.0),
         new THREE.Vector3(-3.44, 2.98, 0.5),
     ]);
-    const bLine = new THREE.Mesh(new THREE.TubeGeometry(bCurve, 40, 0.004, 4, false), toon(0x2a2c46));
+    const bLine = new THREE.Mesh(new THREE.TubeGeometry(bCurve, 40, 0.006, 5, false), toon(0x2a2c46));
     bLine.userData.noOutline = true;
     bunting.add(bLine);
     const flagShape = new THREE.Shape();
@@ -403,7 +403,7 @@ export function buildRoom(updates) {
         const knot = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.06, 8), toon(color));
         knot.position.y = -0.25;
         knot.rotation.x = Math.PI;
-        const str = new THREE.Mesh(new THREE.CylinderGeometry(0.0022, 0.0022, 0.9, 4), toon(0xd8c8b8));
+        const str = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.9, 8), toon(0xb9a894));
         str.position.y = -0.72;
         str.userData.noOutline = true;
         g.add(b, knot, str);
@@ -425,7 +425,7 @@ export function buildRoom(updates) {
         new THREE.Vector3(-3.455, 2.08, 0.35),
         new THREE.Vector3(-3.455, 2.16, 1.2),
     ]);
-    const stringMesh = new THREE.Mesh(new THREE.TubeGeometry(stringCurve, 30, 0.004, 4, false), toon(0x2a2c46));
+    const stringMesh = new THREE.Mesh(new THREE.TubeGeometry(stringCurve, 30, 0.006, 5, false), toon(0x2a2c46));
     stringMesh.userData.noOutline = true;
     photoGroup.add(stringMesh);
     const polaroids = [
