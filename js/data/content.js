@@ -73,7 +73,7 @@ export const ENDING = {
     bottleSave: '放进瓶子',
     bottleSaved: '收好了，明年这天再打开。',
     openBottle: '去愿望瓶',
-    roam: '屋子随便逛，烟花一直放着',
+    roam: '屋子随便逛，烟花一直放着 · 点蛋糕上的那封信能再看一遍',
     again: '再过一次生日',
     fireworks: '再放一场烟花',
     replayHint: '点一下，重新来过',

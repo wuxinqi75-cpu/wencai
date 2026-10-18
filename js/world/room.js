@@ -329,14 +329,18 @@ export function buildRoom(updates) {
     room.add(posterFrame);
     /* ---------------- 小挂星 ---------------- */
     const hangers = new THREE.Group();
+    const rodY = winY1 + 0.1;
+    // 挂在窗帘杆下面。原来中间那颗正好落在杆的高度上，转起来会穿模，
+    // 杆的看着就像一直在跳；左边那颗还钻进了窗帘后面，会被帘子切掉。
     const hangPos = [
-        [-2.5, 2.55],
-        [-1.75, 2.72],
-        [-0.95, 2.5],
+        [-2.05, 2.34],
+        [-1.45, 2.12],
+        [-0.82, 2.3],
     ];
     hangPos.forEach(([x, y], i) => {
-        const line = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.5, 4), toon(0x2a2c46));
-        line.position.set(x, y + 0.25, -2.9);
+        const drop = Math.max(0.12, rodY - y);
+        const line = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, drop, 4), toon(0x2a2c46));
+        line.position.set(x, y + drop / 2, -2.9);
         line.userData.noOutline = true;
         const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.075, 0), toon(i === 1 ? 0xffd38a : 0xf6b8cc));
         star.position.set(x, y, -2.9);

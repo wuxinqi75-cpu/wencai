@@ -209,6 +209,7 @@ let bottleBtn = null;
 let bottlePanel = null;
 let endShown = false;
 let endCard = null;
+let letterOpen = false;
 onAchievement((def) => {
     overlay.achv(`成就解锁 · ${def.name}`);
     bottlePanel?.refresh();
@@ -276,11 +277,14 @@ function showCakeToggle() {
     });
 }
 function tap(clientX, clientY) {
-    if (phase === 'open') {
+    if (phase === 'open' || phase === 'finale') {
         toNDC(clientX, clientY, ndc);
         raycaster.setFromCamera(ndc, camera);
         if (raycaster.intersectObject(cakeCut.hit, false).length > 0) {
-            openLetter();
+            if (phase === 'open')
+                openLetter();
+            else
+                reopenLetter();
             return;
         }
     }
@@ -474,6 +478,17 @@ function openLetter() {
         startCelebration();
     });
 }
+/* 自由探索时再点一次蛋糕上的那封信：只重看，不再走一遍结尾 */
+function reopenLetter() {
+    if (letterOpen || bottlePanel || endCard)
+        return;
+    letterOpen = true;
+    overlay.setDim(0.32);
+    showLetter(() => {
+        letterOpen = false;
+        overlay.setDim(0);
+    });
+}
 /* ---------------- 自由探索 · 烟花 · 愿望瓶 ---------------- */
 function startCelebration() {
     if (roam)
@@ -485,6 +500,8 @@ function startCelebration() {
     exposureTarget = 1.0;
     overlay.setDim(0);
     fireworks.start();
+    // 手机屏幕上那块信太小，点不准；把它的隐形点击球放大
+    cakeCut.hit.scale.setScalar(2.6);
     overlay.flashHint('生日快乐，到处看看', 2600);
     overlay.setHint(ENDING.roam);
     window.setTimeout(() => unlock('firework'), 3800);

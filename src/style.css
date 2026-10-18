@@ -55,7 +55,10 @@ body {
   background: rgba(12, 16, 34, 0.52);
   border: 1px solid rgba(255, 208, 138, 0.22);
   backdrop-filter: blur(8px);
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.5;
+  max-width: calc(var(--lw) - 44px);
   transition: opacity 0.8s ease;
   z-index: 6;
 }
