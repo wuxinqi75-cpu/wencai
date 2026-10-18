@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0a0d1e" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>给姐姐的房间</title>
+    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="stylesheet" href="./src/panels.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js",
+          "three/addons/": "./vendor/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+    <div class="vignette"></div>
+    <div class="hint" id="hint">轻轻拖动，看看房间</div>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

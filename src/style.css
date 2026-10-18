@@ -1,0 +1,227 @@
+:root {
+  --ink: #0a0d1e;
+  --cream: #fbf0dd;
+  --gold: #ffd08a;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 18%, #1a2145 0%, #10142c 38%, #070913 100%);
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+  color: var(--cream);
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 80% at 50% 46%,
+    rgba(0, 0, 0, 0) 42%,
+    rgba(4, 6, 16, 0.42) 78%,
+    rgba(3, 4, 10, 0.72) 100%
+  );
+}
+
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: rgba(251, 240, 221, 0.86);
+  background: rgba(12, 16, 34, 0.52);
+  border: 1px solid rgba(255, 208, 138, 0.22);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  transition: opacity 0.8s ease;
+  z-index: 6;
+}
+
+/* ---------------- 界面 ---------------- */
+
+.ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.ui-top {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  color: rgba(251, 240, 221, 0.66);
+}
+
+.brand-age {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  border: 1px solid rgba(255, 208, 138, 0.35);
+  border-radius: 999px;
+  padding: 1px 7px;
+  transform: translateY(-1px);
+}
+
+.trail {
+  display: flex;
+  gap: 7px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 208, 138, 0.22);
+  transition: background 0.45s ease, box-shadow 0.45s ease, transform 0.45s ease;
+}
+
+.dot.on {
+  background: var(--gold);
+  box-shadow: 0 0 10px rgba(255, 208, 138, 0.9);
+  transform: scale(1.3);
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  transform: translate(-50%, 10px);
+  max-width: min(78vw, 460px);
+  padding: 14px 20px;
+  border-radius: 16px;
+  background: rgba(13, 17, 36, 0.74);
+  border: 1px solid rgba(255, 208, 138, 0.18);
+  color: var(--cream);
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: center;
+  opacity: 0;
+  backdrop-filter: blur(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------------- 开场 ---------------- */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(120% 90% at 50% 30%, #161d3d 0%, #0a0f22 55%, #05070f 100%);
+  transition: opacity 0.85s ease;
+}
+
+.intro.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-inner {
+  text-align: center;
+  padding: 0 30px;
+  animation: introIn 1.1s ease both;
+}
+
+@keyframes introIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.intro-kicker {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: rgba(255, 208, 138, 0.7);
+}
+
+.intro-title {
+  margin: 16px 0 12px;
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+}
+
+.intro-sub {
+  margin: 0 0 36px;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: rgba(251, 240, 221, 0.55);
+}
+
+.intro-btn {
+  pointer-events: auto;
+  appearance: none;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid rgba(255, 208, 138, 0.45);
+  border-radius: 999px;
+  padding: 12px 34px;
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  font-family: inherit;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.intro-btn:active {
+  background: rgba(255, 208, 138, 0.12);
+}
+
+@media (max-width: 420px) {
+  .intro-title {
+    font-size: 28px;
+  }
+  .toast {
+    font-size: 14px;
+    bottom: 18%;
+  }
+}
