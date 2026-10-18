@@ -30,7 +30,21 @@ export function createTurnButton(onChange) {
         onChange();
     };
     el.addEventListener('click', toggle);
-    window.addEventListener('resize', sync);
+    /* 系统自己转成横屏了（手机没锁方向、或者用户关了竖屏锁定）→ 立刻放手，
+       不然「CSS 转 90°」和系统旋转会叠成两次，画面横过来又歪过去 */
+    const autoRelease = () => {
+        if (on && window.innerWidth > window.innerHeight) {
+            on = false;
+            setForcedLandscape(false);
+            sync();
+            onChange();
+        }
+    };
+    window.addEventListener('resize', () => {
+        autoRelease();
+        sync();
+    });
+    window.addEventListener('orientationchange', autoRelease);
     sync();
     return { el, sync, isOn: () => on, toggle };
 }
