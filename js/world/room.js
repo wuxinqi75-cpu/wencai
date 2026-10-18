@@ -153,14 +153,18 @@ export function buildRoom(updates) {
     const frameMat = 0xead7bd;
     const fw = 0.07;
     const frame = new THREE.Group();
-    const top = box(winX1 - winX0 + fw * 2, fw, 0.16, frameMat);
-    top.position.set((winX0 + winX1) / 2, winY1 + fw / 2, -2.98);
-    const bot = box(winX1 - winX0 + fw * 2, fw, 0.16, frameMat);
-    bot.position.set((winX0 + winX1) / 2, winY0 - fw / 2, -2.98);
-    const l = box(fw, winY1 - winY0 + fw * 2, 0.16, frameMat);
-    l.position.set(winX0 - fw / 2, (winY0 + winY1) / 2, -2.98);
-    const r = box(fw, winY1 - winY0 + fw * 2, 0.16, frameMat);
-    r.position.set(winX1 + fw / 2, (winY0 + winY1) / 2, -2.98);
+    /* 窗框四根条原来正好卡在「挖窗」的墙切面上（竖框内侧面在 x=winX0，横框上/下面在 winY1/winY0），
+       两面完全重合 → 深度打架，镜头一晃那根竖框就闪出虚影。现在每根都往窗洞里多探 ov，
+       离墙面 3cm，重合的面就没了。 */
+    const ov = 0.03;
+    const top = box(winX1 - winX0 + fw * 2, fw + ov, 0.16, frameMat);
+    top.position.set((winX0 + winX1) / 2, winY1 + fw / 2 - ov / 2, -2.98);
+    const bot = box(winX1 - winX0 + fw * 2, fw + ov, 0.16, frameMat);
+    bot.position.set((winX0 + winX1) / 2, winY0 - fw / 2 + ov / 2, -2.98);
+    const l = box(fw + ov, winY1 - winY0 + fw * 2, 0.16, frameMat);
+    l.position.set(winX0 - fw / 2 + ov / 2, (winY0 + winY1) / 2, -2.98);
+    const r = box(fw + ov, winY1 - winY0 + fw * 2, 0.16, frameMat);
+    r.position.set(winX1 + fw / 2 - ov / 2, (winY0 + winY1) / 2, -2.98);
     const midV = box(0.045, winY1 - winY0, 0.1, frameMat);
     midV.position.set((winX0 + winX1) / 2, (winY0 + winY1) / 2, -2.99);
     const midH = box(winX1 - winX0, 0.04, 0.1, frameMat);
@@ -195,11 +199,12 @@ export function buildRoom(updates) {
         const pos = geo.attributes.position;
         for (let i = 0; i < pos.count; i++) {
             const u = (pos.getX(i) + 0.17) / 0.34;
-            pos.setZ(i, Math.sin(u * Math.PI * 5) * 0.045);
+            pos.setZ(i, Math.sin(u * Math.PI * 5) * 0.03);
         }
         pos.needsUpdate = true;
         const m = new THREE.Mesh(geo, curtainMat);
-        m.position.set(x, 1.93, -2.86);
+        // z=-2.85 + 褶皱 ±0.03：最深处 -2.88，仍比窗框前面（-2.90）靠前 2cm，不会扎进窗框里闪
+        m.position.set(x, 1.93, -2.85);
         m.userData.noOutline = true;
         return m;
     };
@@ -249,11 +254,11 @@ export function buildRoom(updates) {
     /* ---------------- 灯串 ---------------- */
     /* 这根线原来半径 0.005（1cm），远看比一个像素还细，渲染出来是断续的虚线段，
        镜头一晃就在跳；而且它穿过两边的窗帘，那里的线会被帘子切成一节一节的。
-       现在：加粗到 0.009，整根挪到窗帘前面（z=-2.78，帘子最靠前只到 -2.815）。 */
+       现在：加粗到 0.009，整根挂到窗帘前面（z=-2.72，帘子最靠前只到 -2.82）。 */
     const pts = [];
     for (let i = 0; i <= 22; i++) {
         const u = i / 22;
-        pts.push(new THREE.Vector3(-3.35 + u * 6.7, 2.72 - Math.sin(u * Math.PI) * 0.42, -2.78 + Math.sin(u * Math.PI * 2) * 0.03));
+        pts.push(new THREE.Vector3(-3.35 + u * 6.7, 2.72 - Math.sin(u * Math.PI) * 0.42, -2.72 + Math.sin(u * Math.PI * 2) * 0.025));
     }
     const curve = new THREE.CatmullRomCurve3(pts);
     const wire = new THREE.Mesh(new THREE.TubeGeometry(curve, 140, 0.009, 6, false), toon(0x23253c));
