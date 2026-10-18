@@ -67,7 +67,7 @@ export function createTurnButton(onChange) {
             setForcedLandscape(false);
         mode = 'off';
     };
-    el.addEventListener('click', () => {
+    const toggle = () => {
         if (busy)
             return;
         busy = true;
@@ -88,7 +88,8 @@ export function createTurnButton(onChange) {
                 busy = false;
             }
         })();
-    });
+    };
+    el.addEventListener('click', toggle);
     window.addEventListener('resize', sync);
     window.addEventListener('orientationchange', () => {
         if (mode === 'native' && !document.fullscreenElement)
@@ -104,5 +105,5 @@ export function createTurnButton(onChange) {
         }
     });
     sync();
-    return { el, sync, isOn: () => mode !== 'off' };
+    return { el, sync, isOn: () => mode !== 'off', toggle };
 }

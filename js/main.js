@@ -576,6 +576,7 @@ canvas.addEventListener('pointerup', (e) => {
 overlay.intro(() => {
     begin();
 });
+overlay.introTip(() => turnBtn.toggle());
 function begin() {
     started = true;
     phase = 'stars';

@@ -29,7 +29,7 @@ export function createOverlay(total) {
       <h1 class="intro-title">${ROOM_TITLE}</h1>
       <p class="intro-sub">灯还亮着，星星刚睡醒。</p>
       <button class="intro-btn" type="button">推门进去</button>
-      <p class="intro-tip">横屏看更完整</p>
+      <button class="intro-tip" type="button">横屏看更完整</button>
     </div>
   `;
     document.body.appendChild(introEl);
@@ -95,6 +95,10 @@ export function createOverlay(total) {
                 start();
                 dismissIntro();
             });
+        },
+        introTip(cb) {
+            const tip = introEl.querySelector('.intro-tip');
+            tip?.addEventListener('click', cb);
         },
         dismissIntro,
     };
