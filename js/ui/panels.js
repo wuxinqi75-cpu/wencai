@@ -151,6 +151,7 @@ export function showFinale(o) {
       </div>
 
       <div class="finale-actions">
+        <button class="btn btn-ghost" data-role="poster" type="button">存一张海报</button>
         <button class="btn btn-ghost" data-role="fw" type="button">${ENDING.fireworks}</button>
         <button class="btn btn-ghost" data-role="again" type="button">${ENDING.again}</button>
       </div>
@@ -202,6 +203,9 @@ export function showFinale(o) {
     });
     sheet.el.querySelector('[data-role="fw"]').addEventListener('click', o.onMoreFireworks);
     sheet.el.querySelector('[data-role="again"]').addEventListener('click', o.onReplay);
+    sheet.el.querySelector('[data-role="poster"]').addEventListener('click', () => {
+        o.onPoster?.();
+    });
     sheet.el.querySelector('[data-role="close"]').addEventListener('click', () => {
         sheet.close();
         o.onClose?.();

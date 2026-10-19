@@ -14,6 +14,7 @@ import { createFireworks } from './fx/fireworks.js';
 import { startBlow } from './core/mic.js';
 import { showBlowPanel, showWish, showLetter, showFinale, showFloatButton, showCornerButton, showEndCard, createFocusBar } from './ui/panels.js';
 import { createVault } from './ui/vault.js';
+import { drawPoster, showPoster } from './ui/poster.js';
 import { unlock, has, allAchievements, onAchievement } from './core/achievements.js';
 import { CONFIG, BLESSINGS, BLOW, CUT, ENDING } from './data/content.js';
 import { ensureAudio, getContext, chime, softClick, startAmbience, ambienceLevel, sndBlowOut, sndSlice, playBirthday, stopBirthday, setMuted, } from './core/audio.js';
@@ -248,6 +249,10 @@ let bottlePanel = null;
 let endShown = false;
 let endCard = null;
 let letterOpen = false;
+let letterPanel = null;
+/* 海报要等下一帧 render 完再截（WebGL 的 drawing buffer 过了那帧就清空了） */
+let posterRequest = null;
+let posterPanel = null;
 onAchievement((def) => {
     overlay.achv(`成就解锁 · ${def.name}`);
     bottlePanel?.refresh();
@@ -510,7 +515,8 @@ function openLetter() {
     openBtn?.close();
     openBtn = null;
     overlay.setDim(0.35);
-    showLetter(() => {
+    letterPanel = showLetter(() => {
+        letterPanel = null;
         unlock('letter');
         overlay.setDim(0);
         startCelebration();
@@ -522,8 +528,9 @@ function reopenLetter() {
         return;
     letterOpen = true;
     overlay.setDim(0.32);
-    showLetter(() => {
+    letterPanel = showLetter(() => {
         letterOpen = false;
+        letterPanel = null;
         overlay.setDim(0);
     });
 }
@@ -563,6 +570,19 @@ function openBottle() {
             for (let i = 0; i < 5; i++) {
                 window.setTimeout(() => fireworks.burst((i + 1) % 4), 260 * i);
             }
+        },
+        onPoster: () => {
+            /* 等下一帧渲染完再截图，不然拿到的是一张空白 */
+            posterRequest = () => {
+                try {
+                    posterPanel = showPoster(drawPoster(canvas), () => {
+                        posterPanel = null;
+                    });
+                }
+                catch (err) {
+                    console.warn('poster failed', err);
+                }
+            };
         },
         onClose: () => {
             bottlePanel = null;
@@ -605,6 +625,52 @@ function replay() {
     requestAnimationFrame(() => (black.style.opacity = '1'));
     window.setTimeout(() => window.location.reload(), 950);
 }
+/* ---------------- 安卓返回键 ---------------- */
+/* 面板开着时按返回先关面板，别一下子把整页退掉。
+   做法：有面板就压一条 history，popstate 时关掉最上层。 */
+let backGuard = false;
+function overlayOpen() {
+    return letterOpen || !!bottlePanel || !!endCard || !!posterPanel;
+}
+function syncBackGuard() {
+    const open = overlayOpen();
+    if (open && !backGuard) {
+        try {
+            history.pushState({ backGuard: 1 }, '');
+            backGuard = true;
+        }
+        catch {
+            /* 个别环境不让 pushState，退化成不拦 */
+        }
+    }
+    else if (!open && backGuard) {
+        backGuard = false;
+    }
+}
+function closeTopOverlay() {
+    if (posterPanel) {
+        posterPanel.close();
+        return true;
+    }
+    if (letterPanel) {
+        letterPanel.close();
+        return true;
+    }
+    if (bottlePanel) {
+        bottlePanel.close();
+        return true;
+    }
+    if (endCard) {
+        endCard.close();
+        return true;
+    }
+    return false;
+}
+window.addEventListener('popstate', () => {
+    backGuard = false;
+    closeTopOverlay();
+    syncBackGuard();
+});
 /* ---------------- 指针 ---------------- */
 let downX = 0;
 let downY = 0;
@@ -693,7 +759,13 @@ renderer.setAnimationLoop(() => {
     exposure += (exposureTarget - exposure) * Math.min(1, dt * 1.6);
     renderer.toneMappingExposure = exposure;
     renderer.render(scene, camera);
+    if (posterRequest) {
+        const fn = posterRequest;
+        posterRequest = null;
+        fn();
+    }
     adaptPerf(dt);
+    syncBackGuard();
     if (!booted) {
         booted = true;
         /* 告诉 index.html 的兜底计时器：真的跑起来了 */

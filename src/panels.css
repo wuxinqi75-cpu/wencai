@@ -1178,3 +1178,57 @@ html.kb .letter-card {
   }
 }
 
+/* ---------------- 祝福海报 ---------------- */
+
+.poster-sheet {
+  z-index: 30;
+  justify-content: center;
+  background: rgba(2, 3, 10, 0.86);
+}
+
+.poster-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+}
+
+.poster-img {
+  max-width: min(calc(var(--lw) - 72px), 400px);
+  max-height: 58vh;
+  border-radius: 16px;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.55);
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+.poster-tip {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: rgba(251, 240, 221, 0.6);
+}
+
+.poster-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.poster-actions .btn {
+  padding: 9px 20px;
+  font-size: 13px;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* 横屏矮屏：海报竖着放不下，缩一缩 */
+html.short-land .poster-img {
+  max-height: 62vh;
+  max-width: 240px;
+}
+
+html.short-land .poster-card {
+  gap: 6px;
+}
+

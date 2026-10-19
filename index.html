@@ -45,8 +45,8 @@
         <div class="fb-age">27</div>
         <div class="fb-title">姐姐，生日快乐</div>
         <p class="fb-note">
-          这个房间要用新一点的浏览器才能打开……<br />
-          换成手机自带的浏览器，或者在电脑上再点一次这个链接。
+          网页加载有点慢，耐心等一等，它自己会出来的。<br />
+          要是等了很久还是这样，换成手机自带的浏览器，或者在电脑上打开。
         </p>
         <button type="button" class="fb-retry" id="fbRetry">再试一次</button>
       </div>
@@ -57,18 +57,27 @@
       (function () {
         var shown = false;
         var box = document.getElementById('fallback');
+        var watcher = 0;
         window.__fail = function () {
           if (shown) return;
           shown = true;
           box.hidden = false;
+          /* 网络慢的时候页面可能晚一步才起来：一起来就把这块收掉 */
+          watcher = setInterval(function () {
+            if (window.__booted) {
+              box.hidden = true;
+              shown = false;
+              clearInterval(watcher);
+            }
+          }, 800);
         };
         document.getElementById('fbRetry').addEventListener('click', function () {
           location.reload();
         });
-        /* 3.5 秒还没跑起来就兜底（网慢也能点重试） */
+        /* 6 秒还没跑起来才提示（网慢也能点重试） */
         setTimeout(function () {
           if (!window.__booted) window.__fail();
-        }, 3500);
+        }, 6000);
       })();
     </script>
   </body>
