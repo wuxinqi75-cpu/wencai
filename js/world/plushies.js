@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../../vendor/three.module.js';
 import { toon, outline, contactShadow, ball, rounded } from '../core/three-setup.js';
 /* ------------------------------------------------------------------ */
 function eyes(parent, r, y, z, off, color = 0x2a2333) {

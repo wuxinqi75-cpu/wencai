@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import * as THREE from '../../vendor/three.module.js';
+import { FontLoader } from '../../vendor/addons/loaders/FontLoader.js';
+import { TextGeometry } from '../../vendor/addons/geometries/TextGeometry.js';
 import { toon, outline, canvasTex, contactShadow, cyl, ball, rand, } from '../core/three-setup.js';
 function flameTexture() {
     return canvasTex(64, 96, (c, W, H) => {

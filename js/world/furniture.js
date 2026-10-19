@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../../vendor/three.module.js';
 import { toon, outline, canvasTex, glow, contactShadow, rounded, box, cyl, ball, } from '../core/three-setup.js';
 export function buildFurniture(updates) {
     const group = new THREE.Group();

@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../../vendor/three.module.js';
 import { glow } from '../core/three-setup.js';
 export function createFirefly() {
     const g = new THREE.Group();

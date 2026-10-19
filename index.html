@@ -7,23 +7,69 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
     />
     <meta name="theme-color" content="#0a0d1e" />
+    <meta name="format-detection" content="telephone=no,email=no,address=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="robots" content="noindex, nofollow" />
     <title>给姐姐的房间</title>
+
+    <!-- 分享出去时（iMessage / Telegram / QQ / 微信部分客户端）显示成一张卡片 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="给姐姐的房间" />
+    <meta property="og:description" content="灯还亮着，星星刚睡醒。" />
+    <meta property="og:image" content="https://wuxinqi75-cpu.github.io/wencai/img/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://wuxinqi75-cpu.github.io/wencai/" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🎂</text></svg>"
+    />
     <link rel="stylesheet" href="./src/style.css" />
     <link rel="stylesheet" href="./src/panels.css" />
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "./vendor/three.module.js",
-          "three/addons/": "./vendor/addons/"
-        }
-      }
-    </script>
+    <!-- 提前抓 three，省掉一轮往返；不支持的浏览器直接忽略 -->
+    <link rel="modulepreload" href="./vendor/three.module.js" />
   </head>
   <body>
     <canvas id="stage"></canvas>
     <div class="vignette"></div>
     <div class="hint" id="hint">轻轻拖动，看看房间</div>
-    <script type="module" src="./js/main.js"></script>
+
+    <!-- 兜底页：老浏览器 / WebGL 不可用 / 脚本没加载出来时显示。
+         三维房间进不去，祝福也要送到。 -->
+    <div id="fallback" hidden>
+      <div class="fb-stars"></div>
+      <div class="fb-body">
+        <div class="fb-age">27</div>
+        <div class="fb-title">姐姐，生日快乐</div>
+        <p class="fb-note">
+          这个房间要用新一点的浏览器才能打开……<br />
+          换成手机自带的浏览器，或者在电脑上再点一次这个链接。
+        </p>
+        <button type="button" class="fb-retry" id="fbRetry">再试一次</button>
+      </div>
+    </div>
+
+    <script type="module" src="./js/main.js" onerror="window.__fail && window.__fail()"></script>
+    <script>
+      (function () {
+        var shown = false;
+        var box = document.getElementById('fallback');
+        window.__fail = function () {
+          if (shown) return;
+          shown = true;
+          box.hidden = false;
+        };
+        document.getElementById('fbRetry').addEventListener('click', function () {
+          location.reload();
+        });
+        /* 3.5 秒还没跑起来就兜底（网慢也能点重试） */
+        setTimeout(function () {
+          if (!window.__booted) window.__fail();
+        }, 3500);
+      })();
+    </script>
   </body>
 </html>

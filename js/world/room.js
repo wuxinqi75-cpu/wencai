@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../../vendor/three.module.js';
 import { toon, outline, canvasTex, glow, rounded, box, cyl, ball, rand, } from '../core/three-setup.js';
 export const ROOM = { w: 7, d: 6, h: 3.2, wallT: 0.14 };
 /* ------------------------------------------------------------------ */

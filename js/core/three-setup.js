@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import * as THREE from '../../vendor/three.module.js';
+import { RoundedBoxGeometry } from '../../vendor/addons/geometries/RoundedBoxGeometry.js';
 /* ---------- 卡通材质 ---------- */
 let grad = null;
 export function toonGradient() {

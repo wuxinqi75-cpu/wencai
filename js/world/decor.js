@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../../vendor/three.module.js';
 import { glow, rand, canvasTex, glowTex } from '../core/three-setup.js';
 const STAR_POSITIONS = [
     [-2.12, 1.56, -0.95],

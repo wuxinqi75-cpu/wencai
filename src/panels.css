@@ -1155,3 +1155,26 @@ html.short-land .sheet > * {
   pointer-events: auto;
 }
 
+/* ---------------- 手机键盘 ---------------- */
+/* iOS 键盘弹出来时 fixed 布局不会跟着缩（visualViewport 变小、layout viewport 不变），
+   愿望瓶的输入框会被键盘整个盖住。main.ts 把键盘高度写进 --kb，这里把面板顶上去。 */
+html.kb .sheet {
+  justify-content: flex-start;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(var(--kb, 0px) + 16px);
+  overflow-y: auto;
+}
+
+html.kb .finale-card,
+html.kb .letter-card {
+  max-height: none;
+}
+
+/* iOS 上输入框字号 <16px 会触发整页自动放大，而且缩不回来（user-scalable=no 拦不住） */
+@media (pointer: coarse) {
+  .bottle-input {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+}
+

@@ -1,5 +1,5 @@
 /* 切蛋糕：用裁剪面把蛋糕劈成两半，中间露出一封信 */
-import * as THREE from 'three';
+import * as THREE from '../../vendor/three.module.js';
 import { toon, canvasTex, glow } from '../core/three-setup.js';
 /* 横截面贴图：v 轴对应蛋糕局部 y（0 ~ 0.319） */
 function crossSection() {

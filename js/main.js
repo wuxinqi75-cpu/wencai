@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../vendor/three.module.js';
 import { buildRoom } from './world/room.js';
 import { buildFurniture } from './world/furniture.js';
 import { buildPlushies } from './world/plushies.js';
@@ -16,7 +16,7 @@ import { showBlowPanel, showWish, showLetter, showFinale, showFloatButton, showC
 import { createVault } from './ui/vault.js';
 import { unlock, has, allAchievements, onAchievement } from './core/achievements.js';
 import { CONFIG, BLESSINGS, BLOW, CUT, ENDING } from './data/content.js';
-import { ensureAudio, chime, softClick, startAmbience, ambienceLevel, sndBlowOut, sndSlice, playBirthday, stopBirthday, setMuted, } from './core/audio.js';
+import { ensureAudio, getContext, chime, softClick, startAmbience, ambienceLevel, sndBlowOut, sndSlice, playBirthday, stopBirthday, setMuted, } from './core/audio.js';
 const canvas = document.getElementById('stage');
 const overlay = createOverlay(7);
 const vault = createVault();
@@ -35,7 +35,9 @@ const renderer = new THREE.WebGLRenderer({
     alpha: true,
     powerPreference: 'high-performance',
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+/* 高分屏最多 2 倍：3 倍屏（不少安卓机）按 3 倍渲染会白白多算一倍像素 */
+const MAX_PR = Math.min(window.devicePixelRatio || 1, 2);
+renderer.setPixelRatio(MAX_PR);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
@@ -111,9 +113,16 @@ let lastX = 0;
 let lastY = 0;
 let dragYaw = 0;
 let dragPitch = 0;
+let lastW = 0;
+let lastH = 0;
 function onResize() {
     const w = viewW();
     const h = viewH();
+    /* iOS 地址栏伸缩会连发 resize；尺寸没真变就别重算，否则画面抖 */
+    if (w === lastW && h === lastH)
+        return;
+    lastW = w;
+    lastH = h;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -121,6 +130,35 @@ function onResize() {
 }
 window.addEventListener('resize', onResize);
 onResize();
+/* 手机切后台，系统可能回收 WebGL 上下文（安卓尤其常见）。
+   preventDefault 表示"我想恢复"；恢复不了就盖一句提示，别给一片白。 */
+const glNote = document.createElement('div');
+glNote.className = 'gl-note';
+glNote.textContent = '画面被系统暂停了，点一下恢复';
+glNote.addEventListener('click', () => window.location.reload());
+document.body.appendChild(glNote);
+canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    glNote.style.display = 'block';
+});
+canvas.addEventListener('webglcontextrestored', () => {
+    glNote.style.display = 'none';
+    lastW = 0;
+    onResize();
+});
+/* iOS / 安卓软键盘：算出键盘占了多高，写进 --kb 交给 CSS 让面板让位 */
+const vv = window.visualViewport;
+function syncKeyboard() {
+    const gap = vv ? window.innerHeight - vv.height - vv.offsetTop : 0;
+    const kb = Math.max(0, Math.min(gap, window.innerHeight * 0.62));
+    document.documentElement.style.setProperty('--kb', `${Math.round(kb)}px`);
+    document.documentElement.classList.toggle('kb', kb > 110);
+}
+if (vv) {
+    vv.addEventListener('resize', syncKeyboard);
+    vv.addEventListener('scroll', syncKeyboard);
+}
+syncKeyboard();
 window.addEventListener('pointerdown', (e) => {
     dragging = true;
     const p = toLocal(e.clientX, e.clientY);
@@ -610,6 +648,33 @@ function begin() {
 /* ---------------- 主循环 ---------------- */
 const clock = new THREE.Clock();
 let elapsed = 0;
+/* 低端机兜底：开跑两秒后如果一直掉在 30fps 上下，降一档像素比。
+   画面糊一点总比划不动强。 */
+let perfFrames = 0;
+let perfAcc = 0;
+let perfDone = false;
+function adaptPerf(dt) {
+    if (perfDone || elapsed < 2)
+        return;
+    perfFrames += 1;
+    perfAcc += dt;
+    if (perfFrames < 90)
+        return;
+    perfDone = true;
+    const avg = perfAcc / perfFrames;
+    const pr = renderer.getPixelRatio();
+    if (avg > 0.031 && pr > 1) {
+        renderer.setPixelRatio(1);
+        lastW = 0;
+        onResize();
+    }
+    else if (avg > 0.024 && pr > 1.5) {
+        renderer.setPixelRatio(1.5);
+        lastW = 0;
+        onResize();
+    }
+}
+let booted = false;
 renderer.setAnimationLoop(() => {
     const dt = Math.min(clock.getDelta(), 0.05);
     elapsed += dt;
@@ -628,10 +693,20 @@ renderer.setAnimationLoop(() => {
     exposure += (exposureTarget - exposure) * Math.min(1, dt * 1.6);
     renderer.toneMappingExposure = exposure;
     renderer.render(scene, camera);
+    adaptPerf(dt);
+    if (!booted) {
+        booted = true;
+        /* 告诉 index.html 的兜底计时器：真的跑起来了 */
+        window.__booted = true;
+    }
 });
 document.addEventListener('visibilitychange', () => {
-    if (!document.hidden)
-        clock.getDelta();
+    if (document.hidden)
+        return;
+    clock.getDelta();
+    /* iOS 切回来音频常被挂起，补一次 resume（解锁过就不用再要手势） */
+    if (getContext())
+        ensureAudio();
 });
 /* ---------------- 调试 ---------------- */
 const dbg = window;
