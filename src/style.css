@@ -59,8 +59,15 @@ body {
   text-align: center;
   line-height: 1.5;
   max-width: calc(var(--lw) - 44px);
-  transition: opacity 0.8s ease;
+  transition:
+    opacity 0.8s ease,
+    bottom 0.45s ease;
   z-index: 6;
+}
+
+/* 「去愿望瓶」浮在底部时，提示要让开，不然手机竖屏上两行字会被按钮压住 */
+body:has(.float-btn.on) .hint {
+  bottom: calc(124px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ---------------- 界面 ---------------- */
